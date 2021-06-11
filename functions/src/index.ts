@@ -1,7 +1,17 @@
 // import {app} from "firebase-admin";
 import * as functions from "firebase-functions";
 import * as express from "express";
-import {menuConfig, fetchMenuConfig} from "./pulseConfig";
+// eslint-disable-next-line object-curly-spacing
+import {
+  menuConfig,
+  fetchMenuConfig,
+  fetchVideos,
+  addVideos,
+  addProfile,
+  fetchProfile,
+  fetchProfileByID,
+  addNewUser,
+} from "./pulseConfig";
 import * as corsLib from "cors";
 const cors = corsLib();
 
@@ -10,17 +20,26 @@ const cors = corsLib();
 //
 const app = express();
 const main = express();
+const video = express();
+const profile = express();
 app.use(cors);
 main.use(cors);
+video.use(cors);
+profile.use(cors);
 // app.get("/", (req, res) => res.status(200).send("Warm up"));
 app.get("/fetchMenuConfig", fetchMenuConfig);
 app.post("/menuConfig", menuConfig);
 exports.pulse = functions.https.onRequest(app);
 
-main.get("/config", (req, res) => res.status(201).send("Ping Pong!"));
-exports.pulseconfig = functions.https.onRequest(main);
+video.get("/fetchVideos", fetchVideos);
+video.post("/addVideos", addVideos);
+exports.pulseVideos = functions.https.onRequest(video);
 
-// export const helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+profile.get("/fetchProfile", fetchProfile);
+profile.post("/fetchProfileByID", fetchProfileByID);
+profile.post("/addProfile", addProfile);
+profile.post("/addNewUser", addNewUser);
+exports.user = functions.https.onRequest(profile);
+
+main.get("/config", (req, res) => res.status(201).send("Ping Pong!"));
+exports.pulseConfig = functions.https.onRequest(main);
